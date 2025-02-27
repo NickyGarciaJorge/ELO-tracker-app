@@ -39,12 +39,12 @@ namespace BierpongProjectWebApi.Controllers
         }
 
         [HttpPost("validate")]
-        public IActionResult ValidateUser([FromBody] User user)
+        public IActionResult ValidateUser([FromBody] UserCredentials credentials)
         {
-            if (user == null || string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
+            if (string.IsNullOrEmpty(credentials.Username) || string.IsNullOrEmpty(credentials.Password))
                 return BadRequest("Invalid username or password");
 
-            bool isValid = _userService.ValidateUser(user.Username, user.Password);
+            bool isValid = _userService.ValidateUser(credentials.Username, credentials.Password);
             if (!isValid)
                 return Unauthorized("Invalid credentials");
 

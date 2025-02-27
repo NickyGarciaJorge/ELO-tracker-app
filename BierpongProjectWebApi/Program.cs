@@ -1,3 +1,7 @@
+using BierpongProjectWebApi.Data;
+using BierpongProjectWebApi.Services;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

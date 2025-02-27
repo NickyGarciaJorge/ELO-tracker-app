@@ -10,6 +10,7 @@ namespace BierpongProjectWebApi.Services
 
         public void AddUser(User user)
         {
+            user.Id = Guid.NewGuid();
             _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
         }
