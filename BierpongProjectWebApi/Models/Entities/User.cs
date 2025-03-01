@@ -19,8 +19,11 @@ namespace BierpongProjectWebApi.Domain.Entities
         [Column("password")]
         public string Password { get; set; }
         [Column("role")]
-        public string Role { get; set; }
+        public UserRole Role { get; set; }
     }
+
+    public enum UserRole { Administrator, User }
+
 
     public class UserCredentials
     {

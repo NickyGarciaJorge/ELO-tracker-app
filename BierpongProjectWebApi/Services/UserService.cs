@@ -16,6 +16,9 @@ namespace BierpongProjectWebApi.Services
         }
 
         public User GetUser(string username) => _dbContext.Users.FirstOrDefault(x => x.Username == username);
+        public string GetUserRole(string username) => _dbContext.Users.FirstOrDefault(x => x.Username == username).Role.ToString();
+
+        public List<User> GetUsers() => _dbContext.Users.ToList();
 
         public bool ValidateUser(string username, string password) => _dbContext.Users.Any(x => x.Username == username && x.Password == password);
 

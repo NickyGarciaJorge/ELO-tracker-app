@@ -1,4 +1,5 @@
 ﻿using BierpongProjectWebApi.Domain.Entities;
+using BierpongProjectWebApi.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BierpongProjectWebApi.Data
@@ -11,5 +12,7 @@ namespace BierpongProjectWebApi.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
     }
 }
