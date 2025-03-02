@@ -7,16 +7,23 @@ namespace BierpongProjectWebApi.Models.Entities
     public class Friendship
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid FriendshipId { get; set; }  // Unique identifier for each friendship
 
+        // User who sent the friend request
         [ForeignKey("User")]
-        public Guid UserId { get; set; }  // The ID of the user who initiated the friendship
+        public Guid UserId { get; set; }
 
+        public UserProfile User { get; set; } // Navigation property
+
+        // Friend (recipient of request)
         [ForeignKey("FriendUser")]
-        public Guid FriendUserId { get; set; }  // The ID of the user who is the friend
+        public Guid FriendUserId { get; set; }
+
+        public UserProfile FriendUser { get; set; } // Navigation property
 
         [Column("Status")]
-        public FriendshipStatus Status { get; set; }  // Enum to track the status of the friendship
+        public FriendshipStatus Status { get; set; }  // Enum to track the friendship status
 
         [Column("DateRequested")]
         public DateTime DateRequested { get; set; }

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BierpongProjectWebApi", "Bi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BierpongProjectWebApp", "BierpongProjectWebApp\BierpongProjectWebApp.csproj", "{BD5438FA-4FB1-4742-99D3-229250E986A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BierpongBackEndApiTest", "BierpongBackEndApiTest\BierpongBackEndApiTest.csproj", "{EDAEC7FD-5D88-4956-B993-856A7980AC29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BD5438FA-4FB1-4742-99D3-229250E986A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD5438FA-4FB1-4742-99D3-229250E986A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD5438FA-4FB1-4742-99D3-229250E986A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDAEC7FD-5D88-4956-B993-856A7980AC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDAEC7FD-5D88-4956-B993-856A7980AC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDAEC7FD-5D88-4956-B993-856A7980AC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDAEC7FD-5D88-4956-B993-856A7980AC29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

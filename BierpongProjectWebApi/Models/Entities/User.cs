@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BierpongProjectWebApi.Models.Entities;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BierpongProjectWebApi.Domain.Entities
@@ -20,6 +21,10 @@ namespace BierpongProjectWebApi.Domain.Entities
         public string Password { get; set; }
         [Column("role")]
         public UserRole Role { get; set; }
+        public UserProfile UserProfile { get; set; }
+
+        public List<Friendship> Friendships { get; set; }
+
     }
 
     public enum UserRole { Administrator, User }

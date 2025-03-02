@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BierpongProjectWebApi.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BierpongProjectWebApi.Models.Entities
@@ -7,6 +8,8 @@ namespace BierpongProjectWebApi.Models.Entities
     public class UserProfile
     {
         [Key]
+        [ForeignKey("User")]
+        [Column("user_id")]
         public Guid UserId { get; set; }  // This should be the foreign key from the User table
 
         [Column("Name")]
@@ -20,6 +23,8 @@ namespace BierpongProjectWebApi.Models.Entities
 
         [Column("ELO")]
         public int ELO { get; set; }
+
+        public User User { get; set; }
 
         // Navigation property for friends (many-to-many relationship via a junction table)
         public List<Friendship> Friendships { get; set; }
