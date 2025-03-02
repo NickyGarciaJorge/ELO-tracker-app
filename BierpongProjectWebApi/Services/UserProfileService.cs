@@ -13,7 +13,7 @@ public class UserProfileService
     }
 
     // Get User Profile by UserId
-    public async Task<UserProfile> GetUserProfileAsync(Guid userId)
+    public virtual async Task<UserProfile> GetUserProfileAsync(Guid userId)
     {
         return await _dbContext.UserProfiles
             .Include(up => up.Friendships)
@@ -21,7 +21,7 @@ public class UserProfileService
     }
 
     // Update User Profile
-    public async Task<UserProfile> UpdateUserProfileAsync(Guid userId, string name, string bio, string profilePictureUrl)
+    public virtual async Task<UserProfile> UpdateUserProfileAsync(Guid userId, string name, string bio, string profilePictureUrl)
     {
         var userProfile = await _dbContext.UserProfiles.FindAsync(userId);
 
@@ -38,7 +38,7 @@ public class UserProfileService
     }
 
     // Add Friend
-    public async Task<bool> AddFriendAsync(Guid userId, Guid friendUserId)
+    public virtual async Task<bool> AddFriendAsync(Guid userId, Guid friendUserId)
     {
         var existingFriendship = await _dbContext.Friendships
             .FirstOrDefaultAsync(f => (f.UserId == userId && f.FriendUserId == friendUserId) || (f.UserId == friendUserId && f.FriendUserId == userId));
@@ -63,7 +63,7 @@ public class UserProfileService
     }
 
     // Accept Friend Request
-    public async Task<bool> AcceptFriendRequestAsync(Guid userId, Guid friendUserId)
+    public virtual async Task<bool> AcceptFriendRequestAsync(Guid userId, Guid friendUserId)
     {
         var friendship = await _dbContext.Friendships
             .FirstOrDefaultAsync(f => f.UserId == friendUserId && f.FriendUserId == userId && f.Status == FriendshipStatus.Pending);
@@ -82,7 +82,7 @@ public class UserProfileService
     }
 
     // Reject or Block Friend Request
-    public async Task<bool> RejectOrBlockFriendRequestAsync(Guid userId, Guid friendUserId, bool isBlock)
+    public virtual async Task<bool> RejectOrBlockFriendRequestAsync(Guid userId, Guid friendUserId, bool isBlock)
     {
         var friendship = await _dbContext.Friendships
             .FirstOrDefaultAsync(f => f.UserId == friendUserId && f.FriendUserId == userId && f.Status == FriendshipStatus.Pending);
@@ -99,7 +99,7 @@ public class UserProfileService
     }
 
     // Get All Friends of a User
-    public async Task<List<UserProfile>> GetUserFriendsAsync(Guid userId)
+    public virtual async Task<List<UserProfile>> GetUserFriendsAsync(Guid userId)
     {
         var friendships = await _dbContext.Friendships
             .Where(f => (f.UserId == userId || f.FriendUserId == userId) && f.Status == FriendshipStatus.Accepted)

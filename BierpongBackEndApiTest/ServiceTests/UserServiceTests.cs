@@ -5,53 +5,57 @@ using BierpongProjectWebApi.Data;
 using BierpongProjectWebApi.Domain.Entities;
 using BierpongProjectWebApi.Services;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Xunit;
 
-namespace BierpongBackEndApiTest
+namespace BierpongBackEndApiTest.ServiceTests
 {
-    public class UserServiceTests
+    public class UserServiceTests : IDisposable
     {
+        private readonly CustomDbContext _dbContext;
         private readonly UserService _userService;
-        private readonly Mock<CustomDbContext> _mockDbContext;
-        private readonly List<User> _users;
 
         public UserServiceTests()
         {
-            // Mock DbSet<User>
-            var mockDbSet = new Mock<DbSet<User>>();
+            // Create in-memory database
+            var options = new DbContextOptionsBuilder<CustomDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Unique DB per test run
+                .Options;
 
-            // Convert list to queryable and attach to mock
-            var users = new List<User>
+            _dbContext = new CustomDbContext(options);
+
+            // Seed the database
+            _dbContext.Users.Add(new User
             {
-                new User { Id = Guid.NewGuid(), Username = "testuser", Name = "Test User", Email = "test@example.com", Password = "password123", Role = UserRole.User }
-            }.AsQueryable();
+                Id = Guid.NewGuid(),
+                Username = "testuser",
+                Name = "Test User",
+                Email = "test@example.com",
+                Password = "password123",
+                Role = UserRole.User
+            });
 
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(users.Provider);
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.Expression);
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.ElementType);
-            mockDbSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
+            _dbContext.SaveChanges();
 
-            // Mock DbContextOptions<CustomDbContext> to pass into the CustomDbContext constructor
-            var mockDbContextOptions = new Mock<DbContextOptions<CustomDbContext>>();
-
-            // Create the mock CustomDbContext without calling the constructor
-            _mockDbContext = new Mock<CustomDbContext>(mockDbContextOptions.Object) { CallBase = true };  // CallBase allows invoking base methods (but still mocking)
-
-            // Set up the DbSet<User> to be returned when accessing the Users property
-            _mockDbContext.Setup(db => db.Users).Returns(mockDbSet.Object);
-
-            // Pass _mockDbContext.Object to UserService
-            _userService = new UserService(_mockDbContext.Object);
+            _userService = new UserService(_dbContext);
         }
 
         [Fact]
         public void AddUser_Should_Add_User_To_Database()
         {
-            var newUser = new User { Username = "newuser", Name = "New User", Email = "new@example.com", Password = "securepassword", Role = UserRole.User };
+            var newUser = new User
+            {
+                Username = "newuser",
+                Name = "New User",
+                Email = "new@example.com",
+                Password = "securepassword",
+                Role = UserRole.User
+            };
+
             _userService.AddUser(newUser);
-            _mockDbContext.Verify(db => db.Users.Add(It.IsAny<User>()), Times.Once);
-            _mockDbContext.Verify(db => db.SaveChanges(), Times.Once);
+            var userInDb = _dbContext.Users.FirstOrDefault(u => u.Username == "newuser");
+
+            Assert.NotNull(userInDb);
+            Assert.Equal("newuser", userInDb.Username);
         }
 
         [Fact]
@@ -109,6 +113,8 @@ namespace BierpongBackEndApiTest
         {
             _userService.UpdateUser("testuser", "Updated Name", "updated@example.com", "newpassword");
             var updatedUser = _userService.GetUser("testuser");
+
+            Assert.NotNull(updatedUser);
             Assert.Equal("Updated Name", updatedUser.Name);
             Assert.Equal("updated@example.com", updatedUser.Email);
         }
@@ -118,7 +124,15 @@ namespace BierpongBackEndApiTest
         {
             _userService.DeleteUser("testuser");
             var result = _userService.GetUser("testuser");
+
             Assert.Null(result);
+        }
+
+        // Dispose the database after each test
+        public void Dispose()
+        {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
         }
     }
 }

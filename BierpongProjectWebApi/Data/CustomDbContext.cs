@@ -6,6 +6,10 @@ namespace BierpongProjectWebApi.Data
 {
     public class CustomDbContext : DbContext
     {
+        public CustomDbContext()
+        {
+            
+        }
         public CustomDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
             

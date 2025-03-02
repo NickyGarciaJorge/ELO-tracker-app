@@ -5,26 +5,30 @@ namespace BierpongProjectWebApi.Services
 {
     public class UserService
     {
+        public UserService()
+        {
+            
+        }
         private readonly CustomDbContext _dbContext;
         public UserService(CustomDbContext dbContext) => _dbContext = dbContext;
 
-        public void AddUser(User user)
+        public virtual void AddUser(User user)
         {
             user.Id = Guid.NewGuid();
             _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
         }
 
-        public User GetUser(string username) => _dbContext.Users.FirstOrDefault(x => x.Username == username);
-        public string GetUserRole(string username) => _dbContext.Users.FirstOrDefault(x => x.Username == username).Role.ToString();
+        public virtual User GetUser(string username) => _dbContext.Users.FirstOrDefault(x => x.Username == username);
+        public virtual string GetUserRole(string username) => _dbContext.Users.FirstOrDefault(x => x.Username == username).Role.ToString();
 
-        public List<User> GetUsers() => _dbContext.Users.ToList();
+        public virtual List<User> GetUsers() => _dbContext.Users.ToList();
 
-        public bool ValidateUser(string username, string password) => _dbContext.Users.Any(x => x.Username == username && x.Password == password);
+        public virtual bool ValidateUser(string username, string password) => _dbContext.Users.Any(x => x.Username == username && x.Password == password);
 
-        public bool UserExists(string username) => _dbContext.Users.Any(x => x.Username == username);
+        public virtual bool UserExists(string username) => _dbContext.Users.Any(x => x.Username == username);
 
-        public void UpdateUser(string username, string name, string email, string password)
+        public virtual void UpdateUser(string username, string name, string email, string password)
         {
             var user = _dbContext.Users.FirstOrDefault(x => x.Username == username);
             if (user == null) return;
@@ -34,7 +38,7 @@ namespace BierpongProjectWebApi.Services
             _dbContext.SaveChanges();
         }
 
-        public void DeleteUser(string username)
+        public virtual void DeleteUser(string username)
         {
             var user = _dbContext.Users.FirstOrDefault(x => x.Username == username);
             if (user == null) return;
