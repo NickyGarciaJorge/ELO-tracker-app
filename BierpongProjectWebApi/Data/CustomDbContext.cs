@@ -1,5 +1,4 @@
-﻿using BierpongProjectWebApi.Domain.Entities;
-using BierpongProjectWebApi.Models.Entities;
+﻿using BierpongProjectWebApi.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BierpongProjectWebApi.Data
@@ -18,6 +17,8 @@ namespace BierpongProjectWebApi.Data
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Friendship> Friendships { get; set; }
         public virtual DbSet<UserProfile> UserProfiles { get; set; }
+        public virtual DbSet<Game> Games { get; set; }
+        public virtual DbSet<MatchHistory> MatchHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +43,26 @@ namespace BierpongProjectWebApi.Data
                     .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete
             });
 
+            modelBuilder.Entity<Game>(entity =>
+            {
+                // Define the primary key
+                entity.HasKey(g => g.GameId);
+
+                // Define the foreign keys for player1 and player2
+                entity.HasOne(g => g.Player1)
+                    .WithMany()
+                    .HasForeignKey(g => g.Player1Id)
+                    .OnDelete(DeleteBehavior.SetNull);  // Set foreign key to NULL instead of cascading delete
+
+                entity.HasOne(g => g.Player2)
+                    .WithMany()
+                    .HasForeignKey(g => g.Player2Id)
+                    .OnDelete(DeleteBehavior.SetNull);  // Set foreign key to NULL instead of cascading delete
+
+                // Optional: configure other properties like the scoreline
+                entity.Property(g => g.Scoreline)
+                    .HasMaxLength(1000);  // Example of setting max length for a string
+            });
 
             modelBuilder.Entity<User>()
            .HasOne(u => u.UserProfile)

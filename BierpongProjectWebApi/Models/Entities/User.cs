@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BierpongProjectWebApi.Domain.Entities
+namespace BierpongProjectWebApi.Models.Entities
 {
     [Table("User")]
     public class User
@@ -10,21 +10,20 @@ namespace BierpongProjectWebApi.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
-        public Guid Id { get; set; }
+        public virtual Guid Id { get; set; }
         [Column("name")]
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
         [Column("email")]
-        public string Email { get; set; }
+        public virtual string Email { get; set; }
         [Column("username")]
-        public string Username { get; set; }
+        public virtual string Username { get; set; }
         [Column("password")]
-        public string Password { get; set; }
+        public virtual string Password { get; set; }
         [Column("role")]
-        public UserRole Role { get; set; }
-        public UserProfile UserProfile { get; set; }
+        public virtual UserRole Role { get; set; }
+        public virtual UserProfile UserProfile { get; set; }
 
-        public List<Friendship> Friendships { get; set; }
-
+        public virtual List<Friendship> Friendships { get; set; }
     }
 
     public enum UserRole { Administrator, User }

@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BierpongProjectWebApi.Domain.Entities;
+using BierpongProjectWebApi.Models.Entities;
 using BierpongProjectWebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

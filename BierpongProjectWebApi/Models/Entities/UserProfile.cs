@@ -1,5 +1,4 @@
-﻿using BierpongProjectWebApi.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BierpongProjectWebApi.Models.Entities
@@ -28,8 +27,5 @@ namespace BierpongProjectWebApi.Models.Entities
 
         // Navigation property for friends (many-to-many relationship via a junction table)
         public virtual List<Friendship> Friendships { get; set; }
-
-        // You can also create a list for game history if needed
-        //public List<GameHistory> GameHistory { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using BierpongProjectWebApi.Controllers;
-using BierpongProjectWebApi.Domain.Entities;
+using BierpongProjectWebApi.Models.Entities;
 using BierpongProjectWebApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

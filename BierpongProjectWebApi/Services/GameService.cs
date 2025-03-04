@@ -1,0 +1,164 @@
+﻿using BierpongProjectWebApi.Data;
+using BierpongProjectWebApi.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace BierpongProjectWebApi.Services
+{
+    public class GameService
+    {
+        private readonly CustomDbContext _context;
+
+        public GameService()
+        {
+            
+        }
+
+        public GameService(CustomDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Game> CreateGameAsync(Guid player1Id, Guid player2Id)
+        {
+            var game = new Game
+            {
+                Player1Id = player1Id,
+                Player2Id = player2Id,
+                StartTime = DateTime.UtcNow,
+                Status = GameStatus.Pending
+            };
+
+            _context.Games.Add(game);
+            await _context.SaveChangesAsync();
+            return game;
+        }
+
+        public async Task<bool> AcceptGameAsync(Guid gameId, Guid playerId)
+        {
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
+
+            if (game == null || game.Status != GameStatus.Pending)
+                return false;
+
+            if (game.Player2Id == playerId)
+            {
+                game.Status = GameStatus.InProgress;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> RejectGameAsync(Guid gameId, Guid playerId)
+        {
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
+
+            if (game == null || game.Status != GameStatus.Pending)
+                return false;
+
+            if (game.Player2Id == playerId)
+            {
+                _context.Games.Remove(game); // Remove rejected game from DB
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> SubmitScoreAsync(Guid gameId, Guid playerId, int player1Score, int player2Score)
+        {
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
+
+            if (game == null || game.Status != GameStatus.InProgress)
+                return false;
+
+            // Allow either player to submit the score
+            if (game.Player1Id == playerId || game.Player2Id == playerId)
+            {
+                game.Player1Score = player1Score;
+                game.Player2Score = player2Score;
+
+                // After score submission, the game enters awaiting confirmation state
+                game.Status = GameStatus.AwaitingConfirmation;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> ConfirmScoreAsync(Guid gameId, Guid playerId)
+        {
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
+
+            if (game == null || game.Status != GameStatus.AwaitingConfirmation)
+                return false;
+
+            // Check if it's the other player's turn to confirm
+            if (game.Player1Id != playerId && game.Player2Id != playerId)
+                return false;
+
+            // The second player confirms the score
+            game.ConfirmedBy = playerId;
+
+            // Set the winner based on the score
+            game.WinnerId = (Guid)(game.Player1Score == 0 ? game.Player2Id : game.Player1Id);
+            game.Scoreline = $"{game.Player1Score}-{game.Player2Score}";
+            game.Status = GameStatus.Finished;
+            game.EndTime = DateTime.UtcNow;
+
+            // Update Elo scores
+            await UpdateEloAsync(game);
+            await AddMatchHistoryAsync(game);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task UpdateEloAsync(Game game)
+        {
+            var player1Profile = await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == game.Player1Id);
+            var player2Profile = await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == game.Player2Id);
+
+            // Example Elo calculation (you should replace this with your own calculation logic)
+            int player1NewElo = player1Profile.ELO + 10;
+            int player2NewElo = player2Profile.ELO - 10;
+
+            player1Profile.ELO = player1NewElo;
+            player2Profile.ELO = player2NewElo;
+
+            await _context.SaveChangesAsync();
+        }
+
+        //change elo calc
+        private async Task AddMatchHistoryAsync(Game game)
+        {
+            var matchHistory1 = new MatchHistory
+            {
+                PlayerId = (Guid)game.Player1Id,
+                GameId = game.GameId,
+                Date = DateTime.UtcNow,
+                Scoreline = game.Scoreline,
+                EloChange = game.WinnerId == game.Player1Id ? 10 : -10
+            };
+
+            var matchHistory2 = new MatchHistory
+            {
+                PlayerId = (Guid)game.Player2Id,
+                GameId = game.GameId,
+                Date = DateTime.UtcNow,
+                Scoreline = game.Scoreline,
+                EloChange = game.WinnerId == game.Player2Id ? 10 : -10
+            };
+
+            _context.MatchHistories.Add(matchHistory1);
+            _context.MatchHistories.Add(matchHistory2);
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+}

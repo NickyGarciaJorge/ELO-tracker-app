@@ -1,5 +1,5 @@
 ﻿using BierpongProjectWebApi.Data;
-using BierpongProjectWebApi.Domain.Entities;
+using BierpongProjectWebApi.Models.Entities;
 
 namespace BierpongProjectWebApi.Services
 {

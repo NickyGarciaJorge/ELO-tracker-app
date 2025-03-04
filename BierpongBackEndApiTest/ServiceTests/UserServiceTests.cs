@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BierpongProjectWebApi.Data;
-using BierpongProjectWebApi.Domain.Entities;
+using BierpongProjectWebApi.Models.Entities;
 using BierpongProjectWebApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
