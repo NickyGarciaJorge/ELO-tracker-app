@@ -12,10 +12,10 @@ namespace BierpongProjectWebApi.Models.Entities
         public virtual Guid GameId { get; set; }
 
         [Column("player1_id")]
-        public virtual Guid Player1Id { get; set; }
+        public virtual Guid? Player1Id { get; set; }
 
         [Column("player2_id")]
-        public virtual Guid Player2Id { get; set; }
+        public virtual Guid? Player2Id { get; set; }
 
         [Column("start_time")]
         public virtual DateTime StartTime { get; set; }
@@ -39,7 +39,7 @@ namespace BierpongProjectWebApi.Models.Entities
         public virtual DateTime? EndTime { get; set; }
 
         [Column("confirmed_by")]
-        public virtual Guid? ConfirmedBy { get; set; } // Tracks who confirmed the score (null if not yet confirmed)
+        public virtual Guid? ConfirmedBy { get; set; }
 
         public virtual User? Player1 { get; set; }
         public virtual User? Player2 { get; set; }

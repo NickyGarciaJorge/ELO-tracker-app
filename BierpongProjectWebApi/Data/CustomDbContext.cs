@@ -52,12 +52,12 @@ namespace BierpongProjectWebApi.Data
                 entity.HasOne(g => g.Player1)
                     .WithMany()
                     .HasForeignKey(g => g.Player1Id)
-                    .OnDelete(DeleteBehavior.SetNull);  // Set foreign key to NULL instead of cascading delete
+                    .OnDelete(DeleteBehavior.NoAction);  // No cascading delete, sets Player1Id to NULL if Player1 is deleted
 
                 entity.HasOne(g => g.Player2)
                     .WithMany()
                     .HasForeignKey(g => g.Player2Id)
-                    .OnDelete(DeleteBehavior.SetNull);  // Set foreign key to NULL instead of cascading delete
+                    .OnDelete(DeleteBehavior.NoAction);  // No cascading delete, sets Player2Id to NULL if Player2 is deleted
 
                 // Optional: configure other properties like the scoreline
                 entity.Property(g => g.Scoreline)
