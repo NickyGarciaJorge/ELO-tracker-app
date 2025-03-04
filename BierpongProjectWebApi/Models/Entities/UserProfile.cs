@@ -10,24 +10,24 @@ namespace BierpongProjectWebApi.Models.Entities
         [Key]
         [ForeignKey("User")]
         [Column("user_id")]
-        public Guid UserId { get; set; }  // This should be the foreign key from the User table
+        public virtual Guid UserId { get; set; }  // This should be the foreign key from the User table
 
         [Column("Name")]
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
         [Column("Bio")]
-        public string Bio { get; set; }
+        public virtual string Bio { get; set; } = "Default Bio";
 
         [Column("ProfilePictureUrl")]
-        public string ProfilePictureUrl { get; set; }
+        public virtual string ProfilePictureUrl { get; set; } = "http://default.com/profile.jpg";
 
         [Column("ELO")]
-        public int ELO { get; set; }
+        public virtual int ELO { get; set; }
 
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
         // Navigation property for friends (many-to-many relationship via a junction table)
-        public List<Friendship> Friendships { get; set; }
+        public virtual List<Friendship> Friendships { get; set; }
 
         // You can also create a list for game history if needed
         //public List<GameHistory> GameHistory { get; set; }

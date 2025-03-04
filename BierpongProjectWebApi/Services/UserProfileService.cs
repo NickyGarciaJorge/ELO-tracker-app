@@ -7,6 +7,10 @@ public class UserProfileService
 {
     private readonly CustomDbContext _dbContext;
 
+    public UserProfileService()
+    {
+        
+    }
     public UserProfileService(CustomDbContext dbContext)
     {
         _dbContext = dbContext;
