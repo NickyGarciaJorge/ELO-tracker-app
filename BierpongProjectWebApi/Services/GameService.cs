@@ -111,38 +111,37 @@ namespace BierpongProjectWebApi.Services
             game.EndTime = DateTime.UtcNow;
 
             // Update Elo scores
-            await UpdateEloAsync(game);
             await AddMatchHistoryAsync(game);
 
             await _context.SaveChangesAsync();
             return true;
         }
 
-        private async Task UpdateEloAsync(Game game)
+        //change elo calc
+        private async Task AddMatchHistoryAsync(Game game)
         {
             var player1Profile = await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == game.Player1Id);
             var player2Profile = await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == game.Player2Id);
 
-            // Example Elo calculation (you should replace this with your own calculation logic)
-            int player1NewElo = player1Profile.ELO + 10;
-            int player2NewElo = player2Profile.ELO - 10;
+            double kFactor = CalcKFactor(game.Player1Score, game.Player2Score);
 
-            player1Profile.ELO = player1NewElo;
-            player2Profile.ELO = player2NewElo;
+            double ePlayer1 = 1 / (1 + Math.Pow(10, (double)(player2Profile.ELO - player1Profile.ELO) / 400));
+            double ePlayer2 = 1 - ePlayer1;
 
-            await _context.SaveChangesAsync();
-        }
+            double sPlayer1 = game.Player1Score > game.Player2Score ? 1 : 0;
+            double sPlayer2 = game.Player2Score > game.Player1Score ? 1 : 0;
 
-        //change elo calc
-        private async Task AddMatchHistoryAsync(Game game)
-        {
+            int newPlayer1Rating = (int)Math.Round(CalcElo(player1Profile.ELO, kFactor, sPlayer1, ePlayer1));
+            int newPlayer2Rating = (int)Math.Round(CalcElo(player2Profile.ELO, kFactor, sPlayer2, ePlayer2));
+
             var matchHistory1 = new MatchHistory
             {
                 PlayerId = (Guid)game.Player1Id,
                 GameId = game.GameId,
                 Date = DateTime.UtcNow,
                 Scoreline = game.Scoreline,
-                EloChange = game.WinnerId == game.Player1Id ? 10 : -10
+                EloChange = player1Profile.ELO - newPlayer1Rating,
+                NewElo = newPlayer1Rating
             };
 
             var matchHistory2 = new MatchHistory
@@ -151,7 +150,8 @@ namespace BierpongProjectWebApi.Services
                 GameId = game.GameId,
                 Date = DateTime.UtcNow,
                 Scoreline = game.Scoreline,
-                EloChange = game.WinnerId == game.Player2Id ? 10 : -10
+                EloChange = player2Profile.ELO - newPlayer2Rating,
+                NewElo = newPlayer2Rating
             };
 
             _context.MatchHistories.Add(matchHistory1);
@@ -159,6 +159,15 @@ namespace BierpongProjectWebApi.Services
 
             await _context.SaveChangesAsync();
         }
-    }
 
+        private double CalcKFactor(int scorePlayer1, int scorePlayer2)
+        {
+            return 0.009 * Math.Pow(Math.Abs(scorePlayer1 - scorePlayer2), 4) + 15;
+        }
+
+        private double CalcElo(double rOld, double k, double s, double e)
+        {
+            return rOld + k * (s - e);
+        }
+    }
 }

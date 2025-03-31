@@ -25,7 +25,7 @@ namespace BierpongBackEndApiTest.ServiceTests
             _dbContext = new CustomDbContext(options);
             _gameService = new GameService(_dbContext);
 
-            _player1 = new UserProfile { UserId = Guid.NewGuid(), ELO = 1200 };
+            _player1 = new UserProfile { UserId = Guid.NewGuid(), ELO = 1600 };
             _player2 = new UserProfile { UserId = Guid.NewGuid(), ELO = 1200 };
 
             _dbContext.UserProfiles.AddRange(_player1, _player2);
@@ -101,6 +101,23 @@ namespace BierpongBackEndApiTest.ServiceTests
             Assert.Equal(GameStatus.Finished, game.Status);
             Assert.Equal(_player1.UserId, game.WinnerId);
             Assert.NotNull(game.EndTime);
+        }
+
+        [Fact]
+        public async Task ConfirmScoreAsync_Should_Return_MatchHistory()
+        {
+            var game = await _gameService.CreateGameAsync(_player1.UserId, _player2.UserId);
+            await _gameService.AcceptGameAsync(game.GameId, _player2.UserId);
+            await _gameService.SubmitScoreAsync(game.GameId, _player1.UserId, 10, 5);
+
+            var result = await _gameService.ConfirmScoreAsync(game.GameId, _player2.UserId);
+
+            Assert.True(result);
+            Assert.Equal(GameStatus.Finished, game.Status);
+            Assert.Equal(_player1.UserId, game.WinnerId);
+            Assert.NotNull(game.EndTime);
+            Assert.NotNull(_dbContext.MatchHistories.FirstOrDefault(x => x.GameId == game.GameId && x.PlayerId == _player1.UserId));
+            Assert.NotNull(_dbContext.MatchHistories.FirstOrDefault(x => x.GameId == game.GameId && x.PlayerId == _player2.UserId));
         }
 
         [Fact]

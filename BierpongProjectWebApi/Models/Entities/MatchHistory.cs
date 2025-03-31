@@ -25,6 +25,8 @@ namespace BierpongProjectWebApi.Models.Entities
 
         [Column("elo_change")]
         public virtual int EloChange { get; set; }
+        [Column("new_elo")]
+        public virtual int NewElo { get; set; }
 
         public virtual User Player { get; set; }
         public virtual Game Game { get; set; }
