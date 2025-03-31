@@ -12,7 +12,7 @@ namespace BierpongProjectWebApi.Models.Entities
         public virtual Guid UserId { get; set; }  // This should be the foreign key from the User table
 
         [Column("Name")]
-        public virtual string Name { get; set; }
+        public virtual string? Name { get; set; }
 
         [Column("Bio")]
         public virtual string Bio { get; set; } = "Default Bio";

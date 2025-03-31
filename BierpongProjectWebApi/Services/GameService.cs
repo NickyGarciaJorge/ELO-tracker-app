@@ -18,7 +18,7 @@ namespace BierpongProjectWebApi.Services
             _context = context;
         }
 
-        public async Task<Game> CreateGameAsync(Guid player1Id, Guid player2Id)
+        public virtual async Task<Game> CreateGameAsync(Guid player1Id, Guid player2Id)
         {
             var game = new Game
             {
@@ -33,7 +33,7 @@ namespace BierpongProjectWebApi.Services
             return game;
         }
 
-        public async Task<bool> AcceptGameAsync(Guid gameId, Guid playerId)
+        public virtual async Task<bool> AcceptGameAsync(Guid gameId, Guid playerId)
         {
             var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
 
@@ -50,7 +50,7 @@ namespace BierpongProjectWebApi.Services
             return false;
         }
 
-        public async Task<bool> RejectGameAsync(Guid gameId, Guid playerId)
+        public virtual async Task<bool> RejectGameAsync(Guid gameId, Guid playerId)
         {
             var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
 
@@ -67,7 +67,7 @@ namespace BierpongProjectWebApi.Services
             return false;
         }
 
-        public async Task<bool> SubmitScoreAsync(Guid gameId, Guid playerId, int player1Score, int player2Score)
+        public virtual async Task<bool> SubmitScoreAsync(Guid gameId, Guid playerId, int player1Score, int player2Score)
         {
             var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
 
@@ -90,7 +90,7 @@ namespace BierpongProjectWebApi.Services
             return false;
         }
 
-        public async Task<bool> ConfirmScoreAsync(Guid gameId, Guid playerId)
+        public virtual async Task<bool> ConfirmScoreAsync(Guid gameId, Guid playerId)
         {
             var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
 

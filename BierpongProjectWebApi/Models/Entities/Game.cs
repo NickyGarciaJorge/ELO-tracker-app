@@ -33,7 +33,7 @@ namespace BierpongProjectWebApi.Models.Entities
         public virtual Guid WinnerId { get; set; }
 
         [Column("scoreline")]
-        public virtual string Scoreline { get; set; }
+        public virtual string? Scoreline { get; set; }
 
         [Column("end_time")]
         public virtual DateTime? EndTime { get; set; }
