@@ -124,9 +124,20 @@ namespace BierpongProjectWebApi.Services
             var player2Profile = await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == game.Player2Id);
 
             double kFactor = CalcKFactor(game.Player1Score, game.Player2Score);
+            double ePlayer1 = 0;
+            double ePlayer2 = 0;
 
-            double ePlayer1 = 1 / (1 + Math.Pow(10, (double)(player2Profile.ELO - player1Profile.ELO) / 400));
-            double ePlayer2 = 1 - ePlayer1;
+
+            if (game.Player1Score > game.Player2Score)
+            {
+                ePlayer1 = 1 / (1 + Math.Pow(10, (double)(player2Profile.ELO - player1Profile.ELO) / 600));
+                ePlayer2 = 1 - ePlayer1;
+            }
+            else
+            {
+                ePlayer2 = 1 / (1 + Math.Pow(10, (double)(player1Profile.ELO - player2Profile.ELO) / 600));
+                ePlayer1 = 1 - ePlayer2;
+            }
 
             double sPlayer1 = game.Player1Score > game.Player2Score ? 1 : 0;
             double sPlayer2 = game.Player2Score > game.Player1Score ? 1 : 0;
