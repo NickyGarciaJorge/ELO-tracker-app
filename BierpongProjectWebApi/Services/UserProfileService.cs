@@ -24,6 +24,7 @@ public class UserProfileService
             .FirstOrDefaultAsync(up => up.UserId == userId);
     }
 
+
     // Update User Profile
     public virtual async Task<UserProfile> UpdateUserProfileAsync(Guid userId, string name, string bio, string profilePictureUrl)
     {
@@ -45,11 +46,11 @@ public class UserProfileService
     public virtual async Task<bool> AddFriendAsync(Guid userId, Guid friendUserId)
     {
         var existingFriendship = await _dbContext.Friendships
-            .FirstOrDefaultAsync(f => (f.UserId == userId && f.FriendUserId == friendUserId) || (f.UserId == friendUserId && f.FriendUserId == userId));
+        .FirstOrDefaultAsync(f => (f.UserId == userId && f.FriendUserId == friendUserId) || (f.UserId == friendUserId && f.FriendUserId == userId));
 
         if (existingFriendship != null)
         {
-            return false;  // Friendship already exists
+            return false;  // Friendship already exists, return false
         }
 
         var friendship = new Friendship
@@ -64,6 +65,24 @@ public class UserProfileService
         await _dbContext.SaveChangesAsync();
 
         return true;
+    }
+    public virtual async Task<bool> AreFriendsAsync(Guid userId, Guid friendUserId)
+    {
+        bool areFriends = await _dbContext.Friendships
+            .AnyAsync(f => (f.UserId == userId && f.FriendUserId == friendUserId) || (f.UserId == friendUserId && f.FriendUserId == userId));
+
+        if (areFriends)
+        {
+            return true;  // Users are friends
+        }
+        else
+        {
+            areFriends = await _dbContext.Friendships
+            .AnyAsync(f => ((f.UserId == userId && f.FriendUserId == friendUserId) || (f.UserId == friendUserId && f.FriendUserId == userId))
+                       && f.Status == FriendshipStatus.Pending);
+        }
+
+        return areFriends;  // Users are not friends
     }
 
     // Accept Friend Request
@@ -115,4 +134,45 @@ public class UserProfileService
             .Where(up => friendIds.Contains(up.UserId))
             .ToListAsync();
     }
+
+    public virtual async Task<List<UserProfile>> GetPendingFriendRequestsAsync(Guid userId)
+    {
+        var pendingRequests = await _dbContext.Friendships
+            .Where(f => f.FriendUserId == userId && f.Status == FriendshipStatus.Pending)
+            .ToListAsync();
+        var requestIds = pendingRequests.Select(f => f.UserId).ToList();
+        return await _dbContext.UserProfiles
+            .Where(up => requestIds.Contains(up.UserId))
+            .ToListAsync();
+    }
+
+    public virtual async Task<bool> RemoveFriendAsync(Guid userId, Guid friendUserId)
+    {
+        var friendship = await _dbContext.Friendships
+            .FirstOrDefaultAsync(f => (f.UserId == userId && f.FriendUserId == friendUserId) || (f.UserId == friendUserId && f.FriendUserId == userId));
+        if (friendship != null)
+        {
+            _dbContext.Friendships.Remove(friendship);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        return false;  // Friendship not found
+    }
+
+    public virtual async Task<List<MatchHistory>> GetMatchHistoryAsync(Guid userId, int pageNumber, int pageSize)
+    {
+        // Calculate the starting index of the records to fetch
+        var skip = (pageNumber - 1) * pageSize;
+
+        // Fetch paginated match history from the database
+        var matchHistory = await _dbContext.MatchHistories
+            .Where(m => m.PlayerId == userId)
+            .OrderByDescending(m => m.Date) // Assuming you want to order by date, you can change this
+            .Skip(skip)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return matchHistory;
+    }
+
 }

@@ -67,6 +67,21 @@ namespace BierpongProjectWebApi.Services
             return false;
         }
 
+        public virtual async Task<bool> CancelGameAsync(Guid gameId, Guid playerId)
+        {
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);
+            if (game == null || game.Status != GameStatus.Pending)
+                return false;
+            // Allow either player to cancel the game
+            if (game.Player1Id == playerId || game.Player2Id == playerId)
+            {
+                _context.Games.Remove(game); // Remove canceled game from DB
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
         public virtual async Task<bool> SubmitScoreAsync(Guid gameId, Guid playerId, int player1Score, int player2Score)
         {
             var game = await _context.Games.FirstOrDefaultAsync(g => g.GameId == gameId);

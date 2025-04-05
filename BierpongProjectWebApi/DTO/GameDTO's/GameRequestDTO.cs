@@ -32,4 +32,9 @@
         public Guid PlayerId { get; set; }
     }
 
+    public class CancelGameRequest
+    {
+        public Guid GameId { get; set; }
+        public Guid PlayerId { get; set; }
+    }
 }
